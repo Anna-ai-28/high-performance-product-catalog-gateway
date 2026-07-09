@@ -1,31 +1,19 @@
-from typing import List
+from app.core.settings import CATALOG_PROVIDER
+from app.providers.mock_provider import MockCatalogProvider
 
 
 class CatalogService:
-    async def get_products(self) -> List[dict]:
-        """
-        Temporary mock implementation.
 
-        Later this method will:
-        1. Check Redis
-        2. Fetch from external API on cache miss
-        3. Update cache
-        """
+    def __init__(self):
 
-        return [
-            {
-                "id": 1,
-                "name": "Laptop",
-                "price": 75000
-            },
-            {
-                "id": 2,
-                "name": "Keyboard",
-                "price": 2500
-            },
-            {
-                "id": 3,
-                "name": "Mouse",
-                "price": 1200
-            }
-        ]
+        if CATALOG_PROVIDER == "mock":
+            self.provider = MockCatalogProvider()
+
+        else:
+            raise ValueError(
+                f"Unsupported provider: {CATALOG_PROVIDER}"
+            )
+
+    async def get_products(self):
+
+        return await self.provider.get_products()
