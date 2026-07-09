@@ -11,11 +11,27 @@ async def request_logging_middleware(request: Request, call_next):
 
     request_id = str(uuid.uuid4())
 
-    start_time = time.perf_counter()
+    start = time.perf_counter()
 
-    response = await call_next(request)
+    try:
 
-    elapsed = (time.perf_counter() - start_time) * 1000
+        response = await call_next(request)
+
+    except Exception:
+
+        elapsed = (time.perf_counter() - start) * 1000
+
+        logger.exception(
+            "[%s] %s %s -> FAILED (%.2f ms)",
+            request_id,
+            request.method,
+            request.url.path,
+            elapsed,
+        )
+
+        raise
+
+    elapsed = (time.perf_counter() - start) * 1000
 
     logger.info(
         "[%s] %s %s -> %s (%.2f ms)",
