@@ -1,18 +1,11 @@
-from app.core.settings import CATALOG_PROVIDER
-from app.providers.mock_provider import MockCatalogProvider
+from app.providers.factory import ProviderFactory
 
 
 class CatalogService:
 
     def __init__(self):
 
-        if CATALOG_PROVIDER == "mock":
-            self.provider = MockCatalogProvider()
-
-        else:
-            raise ValueError(
-                f"Unsupported provider: {CATALOG_PROVIDER}"
-            )
+        self.provider = ProviderFactory.create()
 
     async def get_products(self):
 
