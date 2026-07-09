@@ -1,0 +1,31 @@
+import logging
+import time
+import uuid
+
+from fastapi import Request
+
+logger = logging.getLogger(__name__)
+
+
+async def request_logging_middleware(request: Request, call_next):
+
+    request_id = str(uuid.uuid4())
+
+    start_time = time.perf_counter()
+
+    response = await call_next(request)
+
+    elapsed = (time.perf_counter() - start_time) * 1000
+
+    logger.info(
+        "[%s] %s %s -> %s (%.2f ms)",
+        request_id,
+        request.method,
+        request.url.path,
+        response.status_code,
+        elapsed,
+    )
+
+    response.headers["X-Request-ID"] = request_id
+
+    return response
